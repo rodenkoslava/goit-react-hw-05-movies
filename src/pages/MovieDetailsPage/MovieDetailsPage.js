@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useLocation, Link, Outlet } from 'react-router-dom';
 import { fetchMovieDetails } from '../../api/api';
 import {
@@ -15,16 +15,13 @@ import {
   Score,
 } from './MovieDetailsPage.styled';
 import ButtonBack from 'components/ButtonBack/ButtonBack';
-
 const defaultImg =
   'https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700';
-
 const MoviesDetails = () => {
   const { movieId } = useParams();
-  const [moviesDetails, setMoviesDetails] = useState(null);
   const location = useLocation();
-  const buttonBack = location.state?.from ?? '/';
-
+  const [moviesDetails, setMoviesDetails] = useState(null);
+  const backLinkRef = useRef(location);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,18 +31,14 @@ const MoviesDetails = () => {
         console.error('Error fetching movie details:', error.message);
       }
     };
-
     fetchData();
   }, [movieId]);
-
   if (!moviesDetails) return;
-
   const { poster_path, title, genres, overview, vote_average, release_date } =
     moviesDetails;
-
   return (
     <DetailsContainer>
-      <ButtonBack to={buttonBack} />
+      <ButtonBack to={backLinkRef.current.state?.from ?? '/'} />
       <InfoBox>
         <div>
           <MovieImage
@@ -76,7 +69,6 @@ const MoviesDetails = () => {
           </Genres>
         </div>
       </InfoBox>
-
       <AdditionalInfo>
         <InfoHeading>Additional information</InfoHeading>
         <InfoList>
@@ -92,5 +84,4 @@ const MoviesDetails = () => {
     </DetailsContainer>
   );
 };
-
 export default MoviesDetails;
